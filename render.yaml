@@ -2,16 +2,18 @@ services:
   - type: web
     name: road-pavement-project
     runtime: python
-    rootDir: road_pavement_project
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:${PORT} --workers 2 app:app
     healthCheckPath: /healthz
+    healthCheckStartupTimeout: 60
     autoDeployTrigger: commit
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.3
+        value: "3.10"
       - key: FLASK_SECRET_KEY
         generateValue: true
       - key: SESSION_COOKIE_SECURE
         value: "1"
+      - key: DATA_DIR
+        value: /var/data

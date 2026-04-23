@@ -1,0 +1,9 @@
+flask
+numpy
+pandas
+scikit-learn
+pillow
+joblib
+opencv-python
+gunicorn
+werkzeug
