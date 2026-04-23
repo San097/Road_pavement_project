@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: bash start.sh
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers ${WEB_CONCURRENCY:-1} road_pavement_project.app:app
     healthCheckPath: /healthz
     autoDeployTrigger: commit
     envVars:
