@@ -1,9 +1,0 @@
-{
-  "name": "road-pavement-project",
-  "version": "1.0.0",
-  "description": "Road Pavement Damage Detection and Analysis",
-  "keywords": ["flask", "pavement", "damage-detection", "cv"],
-  "engines": {
-    "python": "3.10.x"
-  }
-}
