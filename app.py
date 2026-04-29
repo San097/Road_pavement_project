@@ -760,9 +760,6 @@ def init_auth_store():
     save_auth_store(store)
 
 
-init_auth_store()
-
-
 def render_login(error=None, info=None):
     return render_template(
         "login.html",

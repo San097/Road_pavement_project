@@ -1,5 +1,35 @@
 # Road Pavement Project - Google Cloud Run Deployment
 
+## Docker Build And Run
+
+Build the image from the repository root:
+
+```bash
+docker build -t road-pavement-project .
+```
+
+Run the container locally on port `8080` and keep uploads/auth data in a mounted folder:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e FLASK_SECRET_KEY=replace-with-a-long-random-secret \
+  -e SESSION_COOKIE_SECURE=0 \
+  -v "$(pwd)/docker-data:/app/data" \
+  road-pavement-project
+```
+
+Windows PowerShell:
+
+```powershell
+docker run --rm -p 8080:8080 `
+  -e FLASK_SECRET_KEY=replace-with-a-long-random-secret `
+  -e SESSION_COOKIE_SECURE=0 `
+  -v "${PWD}\\docker-data:/app/data" `
+  road-pavement-project
+```
+
+The app will be available at `http://localhost:8080`.
+
 ## Quick Start (30 seconds)
 
 1. **Install Google Cloud SDK**

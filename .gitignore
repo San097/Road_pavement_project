@@ -1,0 +1,10 @@
+.env
+.env.*
+__pycache__/
+*.py[cod]
+*.db
+*.db-journal
+*.tmp
+auth_store.json
+uploads/
+road_pavement_project/uploads/
