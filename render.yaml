@@ -2,14 +2,13 @@ services:
   - type: web
     name: road-pavement-project
     runtime: python
+    pythonVersion: 3.11.9
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: bash build.sh
     startCommand: gunicorn app:app
     healthCheckPath: /healthz
     autoDeployTrigger: commit
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
       - key: DATABASE_URL
         sync: false
       - key: FLASK_SECRET_KEY
