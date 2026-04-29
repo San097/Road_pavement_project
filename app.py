@@ -75,7 +75,16 @@ def load_dotenv_file(path):
                 os.environ[key] = value
 
 
-load_dotenv_file(ENV_PATH)
+def should_load_local_env():
+    if os.getenv("LOAD_DOTENV", "").strip().lower() in {"1", "true", "yes"}:
+        return True
+    if os.getenv("LOAD_DOTENV", "").strip().lower() in {"0", "false", "no"}:
+        return False
+    return not any(os.getenv(key) for key in ("VERCEL", "RENDER", "K_SERVICE"))
+
+
+if should_load_local_env():
+    load_dotenv_file(ENV_PATH)
 
 
 def refresh_storage_paths():
