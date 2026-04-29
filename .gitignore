@@ -7,4 +7,5 @@ __pycache__/
 *.tmp
 auth_store.json
 uploads/
+static/uploads/
 road_pavement_project/uploads/

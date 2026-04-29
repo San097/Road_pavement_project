@@ -1,0 +1,1053 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - Road Pavement Deterioration Model</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* page-specific refinement */
+        :root {
+            --bg-primary: #01060f;
+            --bg-secondary: #021124;
+            --card-bg: rgba(6, 20, 35, 0.9);
+            --card-border: rgba(34, 211, 238, 0.24);
+            --text-main: #dff9ff;
+            --text-soft: #9ac8d4;
+            --accent: #1dd3ff;
+            --accent-2: #00e6a9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --critical: #ef4444;
+            --shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: 'Manrope', 'Trebuchet MS', sans-serif;
+            background: radial-gradient(circle at 15% 20%, rgba(29, 211, 255, 0.22) 0%, transparent 36%),
+                        radial-gradient(circle at 85% 10%, rgba(0, 230, 169, 0.17) 0%, transparent 38%),
+                        linear-gradient(130deg, var(--bg-primary), var(--bg-secondary));
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 999px;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::before {
+            width: 260px;
+            height: 260px;
+            top: 20%;
+            left: -80px;
+            background: rgba(14, 165, 233, 0.18);
+            animation: floatBlob 7s ease-in-out infinite;
+        }
+
+        body::after {
+            width: 220px;
+            height: 220px;
+            right: -60px;
+            bottom: 14%;
+            background: rgba(37, 99, 235, 0.16);
+            animation: floatBlob 8s ease-in-out infinite reverse;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            background: rgba(7, 22, 38, 0.95);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            margin: 24px auto 0;
+            max-width: 1180px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.02em;
+            color: #dff9ff;
+            font-family: 'Space Grotesk', 'Manrope', sans-serif;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .user-welcome {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .user-welcome strong {
+            color: #8ceeff;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #fb7185 0%, #ef4444 100%);
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 14px 28px rgba(239, 68, 68, 0.3);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 32px rgba(239, 68, 68, 0.4);
+        }
+
+        .main-content {
+            max-width: 1180px;
+            margin: 30px auto 42px;
+            padding: 0 20px 20px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1.65fr 1fr;
+            gap: 24px;
+        }
+
+        .preview-card,
+        .stats-panel,
+        .details-panel,
+        .final-summary {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 26px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .preview-card h2,
+        .stats-panel h2,
+        .details-panel h2 {
+            margin: 0 0 16px;
+            font-size: 24px;
+            color: #dff9ff;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 20px;
+            object-fit: cover;
+            min-height: 340px;
+            background: rgba(7, 29, 46, 0.86);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            transition: transform 0.35s ease;
+        }
+
+        .preview-image:hover {
+            transform: scale(1.01);
+        }
+
+        .preview-placeholder {
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: rgba(7, 29, 46, 0.86);
+            color: var(--text-soft);
+            font-size: 18px;
+            text-align: center;
+            padding: 24px;
+            border: 1px dashed rgba(34, 211, 238, 0.34);
+        }
+
+        .preview-caption {
+            margin-top: 18px;
+            color: #9ac8d4;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .stats-panel {
+            display: grid;
+            gap: 18px;
+        }
+
+        .stat-card {
+            position: relative;
+            padding: 20px 22px;
+            border-radius: 18px;
+            background: rgba(7, 29, 46, 0.86);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(29, 211, 255, 0.2), transparent 70%);
+            pointer-events: none;
+        }
+
+        .stat-card h4 {
+            margin: 0 0 10px;
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #8ceeff;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 30px;
+            color: #dff9ff;
+            font-weight: 700;
+            line-height: 1.05;
+        }
+
+        .stat-note {
+            margin-top: 10px;
+            color: #9ac8d4;
+            font-size: 13px;
+        }
+
+        .summary-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-top: 14px;
+            padding: 18px 22px;
+            background: rgba(7, 37, 51, 0.7);
+            border-radius: 18px;
+            border: 1px solid rgba(34, 211, 238, 0.24);
+        }
+
+        .summary-strip p {
+            margin: 0;
+            color: #dff9ff;
+            font-size: 15px;
+        }
+
+        .summary-strip strong {
+            color: #8ceeff;
+            font-weight: 700;
+        }
+
+        .details-panel {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+        }
+
+        .detail-card {
+            padding: 22px;
+            border-radius: 18px;
+            background: rgba(7, 29, 46, 0.86);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+        }
+
+        .detail-card h3 {
+            margin: 0 0 16px;
+            color: #dff9ff;
+            font-size: 18px;
+        }
+
+        .detail-info {
+            color: var(--text-soft);
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .metric-value {
+            color: #dff9ff;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .confidence-bar {
+            margin-top: 16px;
+            height: 14px;
+            border-radius: 999px;
+            background: rgba(6, 47, 66, 0.65);
+            overflow: hidden;
+        }
+
+        .sub-image-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(7, 37, 51, 0.7);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+        }
+
+        .sub-image {
+            width: 120px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(2, 6, 23, 0.3);
+        }
+
+        .sub-image-text {
+            color: #c4f3fc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00e6a9 0%, #1dd3ff 100%);
+            width: 0;
+            transition: width 1.2s ease;
+        }
+
+        .actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 999px;
+            text-decoration: none;
+            padding: 14px 26px;
+            font-weight: 700;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.28) 45%, transparent 100%);
+            transform: skewX(-24deg);
+            transition: left 0.7s ease;
+        }
+
+        .btn:hover::before {
+            left: 135%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1dd3ff 0%, #00e6a9 100%);
+            color: #03242e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 14px 28px rgba(0, 230, 169, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(7, 30, 48, 0.86);
+            color: #d6f9ff;
+            border: 1px solid rgba(34, 211, 238, 0.28);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(9, 40, 61, 0.92);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .severity-badge {
+            display: inline-flex;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-critical {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fecaca;
+        }
+
+        .badge-high {
+            background: rgba(245, 158, 11, 0.24);
+            color: #fcd34d;
+        }
+
+        .badge-medium {
+            background: rgba(34, 211, 238, 0.24);
+            color: #8ceeff;
+        }
+
+        .badge-low {
+            background: rgba(34, 197, 94, 0.22);
+            color: #bbf7d0;
+        }
+
+        .final-summary {
+            position: relative;
+            overflow: hidden;
+            animation: riseIn 0.7s ease;
+        }
+
+        .graph-panel {
+            display: grid;
+            gap: 18px;
+        }
+
+        .graph-panel h3 {
+            margin: 0;
+            font-size: 22px;
+            color: #dff9ff;
+        }
+
+        .graph-panel p {
+            margin: 0;
+            color: #9ac8d4;
+            line-height: 1.7;
+        }
+
+        .graph-wrap {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 18px;
+            margin-top: 8px;
+        }
+
+        .graph-bars,
+        .graph-donut {
+            background: rgba(7, 29, 46, 0.86);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .bar-item {
+            margin-bottom: 14px;
+        }
+
+        .bar-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .bar-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+            font-size: 13px;
+            color: #9ac8d4;
+        }
+
+        .bar-track {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(6, 47, 66, 0.65);
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            transition: width 1.1s ease;
+            background: linear-gradient(90deg, #1dd3ff, #00e6a9);
+        }
+
+        .graph-donut {
+            display: grid;
+            place-items: center;
+            position: relative;
+            min-height: 220px;
+        }
+
+        .donut-ring {
+            --percent: 0;
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            background: conic-gradient(#00e6a9 calc(var(--percent) * 1%), rgba(100, 116, 139, 0.25) 0);
+            display: grid;
+            place-items: center;
+            transition: all 1s ease;
+            box-shadow: inset 0 0 0 10px rgba(8, 36, 51, 0.85);
+        }
+
+        .donut-core {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            background: rgba(7, 22, 38, 0.95);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+
+        .donut-core strong {
+            font-size: 28px;
+            color: #dff9ff;
+            line-height: 1;
+        }
+
+        .donut-core span {
+            font-size: 12px;
+            color: #8ceeff;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .final-summary::before {
+            content: '';
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            right: -90px;
+            top: -90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.22), transparent 70%);
+        }
+
+        .final-summary h3 {
+            margin: 0 0 14px;
+            font-size: 24px;
+            color: #dff9ff;
+        }
+
+        .overall-status {
+            margin: 0 0 18px;
+            color: #9ac8d4;
+            line-height: 1.7;
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .solution-card {
+            background: rgba(7, 29, 46, 0.86);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .solution-card h4 {
+            margin: 0 0 8px;
+            color: #8ceeff;
+            font-size: 14px;
+        }
+
+        .solution-card p {
+            margin: 0;
+            color: #9ac8d4;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        #dynamicSolution {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(7, 37, 51, 0.7);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            color: #d8f9ff;
+            line-height: 1.7;
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatBlob {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-24px);
+            }
+        }
+
+        
+        .header-subtitle {
+            margin: 8px 0 0;
+            color: #80f0ff;
+            font-size: 14px;
+            letter-spacing: 0.01em;
+        }
+
+        .reveal-card {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal-card.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .metric-summary {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(34, 211, 238, 0.28);
+            background: rgba(7, 37, 51, 0.7);
+            color: #d8f9ff;
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+
+        .solution-timeline {
+            margin-top: 16px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 28px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .timeline-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #1dd3ff, #00e6a9);
+            color: #03242e;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(0, 230, 169, 0.24);
+        }
+
+        .timeline-text {
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            background: rgba(7, 29, 46, 0.86);
+            color: #9ac8d4;
+            line-height: 1.65;
+            font-size: 13px;
+        }
+
+        #dynamicSolution {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dynamicSolution::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(110deg, transparent, rgba(255,255,255,0.45), transparent);
+            animation: sweep 3.2s linear infinite;
+        }
+
+        @keyframes sweep {
+            to {
+                left: 130%;
+            }
+        }
+        @media (max-width: 980px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .solution-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .graph-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Road Pavement Deterioration Model</h1>
+            <p class="header-subtitle">Prediction report and maintenance guidance</p>
+        </div>
+        <div class="header-right">
+            <div class="user-welcome">
+                Welcome, <strong>{{ username|default('User') }}</strong>!
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="result-grid">
+            <section class="preview-card reveal-card">
+                <h2>Prediction Result</h2>
+                {% if image_url %}
+                <img src="{{ image_url }}" alt="Uploaded road image" class="preview-image" />
+                {% else %}
+                <div class="preview-placeholder">Uploaded image will appear here once the prediction is complete.</div>
+                {% endif %}
+                <p class="preview-caption">This preview uses only the uploaded road image. Unrelated or random images are rejected before prediction.</p>
+            </section>
+
+            <aside class="stats-panel reveal-card">
+                <div class="stat-card">
+                    <h4>Condition</h4>
+                    <p>{{condition}}</p>
+                    <p class="stat-note">Road surface condition detected by the model.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Severity Level</h4>
+                    <div class="metric-value">
+                        {% if severity == "Critical" %}
+                            <span class="severity-badge badge-critical">{{severity}}</span>
+                        {% elif severity == "High" %}
+                            <span class="severity-badge badge-high">{{severity}}</span>
+                        {% elif severity == "Medium" %}
+                            <span class="severity-badge badge-medium">{{severity}}</span>
+                        {% else %}
+                            <span class="severity-badge badge-low">{{severity}}</span>
+                        {% endif %}
+                    </div>
+                    <p class="stat-note">Estimated severity of pavement deterioration.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Maintenance Required</h4>
+                    <p>{{maintenance}}</p>
+                    <p class="stat-note">Recommended action based on the prediction.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Priority Level</h4>
+                    <p>{{priority}}</p>
+                    <p class="stat-note">The urgency level assigned by the model.</p>
+                </div>
+            </aside>
+        </div>
+
+        <section class="details-panel reveal-card">
+            <div class="detail-card">
+                <h3>Analysis Summary</h3>
+                <p class="detail-info">{{ summary }}</p>
+                <div class="summary-strip">
+                    <p>Maintenance Required <strong>{{maintenance}}</strong></p>
+                    <p>Confidence <strong>{{confidence}}%</strong></p>
+                    <p>Damage Score <strong>{{damage_score}}/100</strong></p>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" data-confidence="{{ confidence }}"></div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h3>Repair Summary - Cracks & Potholes</h3>
+                <div class="detail-info" style="white-space: pre-wrap; line-height: 1.8; font-family: 'Courier New', monospace; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px;">{{detail}}</div>
+                <div class="summary-strip" style="margin-top: 20px;">
+                    <p>Segment ID: <strong>{{segment_id}}</strong></p>
+                    <p>Road Type: <strong>{{road_type}}</strong></p>
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Analyze Another Image</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="details-panel graph-panel reveal-card">
+            <h3>Graphical Response</h3>
+            <p>Quick visual breakdown of model confidence and risk scoring for this pavement segment.</p>
+            <div class="graph-wrap">
+                <div class="graph-bars">
+                    <div class="bar-item">
+                        <div class="bar-meta">
+                            <span>Severity Score</span>
+                            <span id="severityScoreLabel">0%</span>
+                        </div>
+                        <div class="bar-track"><div class="bar-fill" id="severityScoreBar"></div></div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-meta">
+                            <span>Priority Score</span>
+                            <span id="priorityScoreLabel">0%</span>
+                        </div>
+                        <div class="bar-track"><div class="bar-fill" id="priorityScoreBar"></div></div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-meta">
+                            <span>Condition Risk Score</span>
+                            <span id="conditionScoreLabel">0%</span>
+                        </div>
+                        <div class="bar-track"><div class="bar-fill" id="conditionScoreBar"></div></div>
+                    </div>
+                </div>
+                <div class="graph-donut">
+                    <div class="donut-ring" id="confidenceDonut">
+                        <div class="donut-core">
+                            <strong id="confidenceDonutValue">0%</strong>
+                            <span>Confidence</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="final-summary reveal-card">
+            <h3>Overall Prediction Summary and Solution Plan</h3>
+            <p class="overall-status">
+                This road segment is currently classified as <strong>{{condition}}</strong> with
+                <strong>{{severity}}</strong> severity and <strong>{{confidence}}%</strong> confidence.
+                Maintenance priority is marked as <strong>{{priority}}</strong>.
+            </p>
+
+            <div id="predictionSummary" class="metric-summary">Preparing prediction summary...</div>
+
+            <div class="solution-grid">
+                <article class="solution-card">
+                    <h4>Immediate Action</h4>
+                    <p>Start with the recommended maintenance: <strong>{{maintenance}}</strong> to reduce short-term risk.</p>
+                </article>
+                <article class="solution-card">
+                    <h4>Safety Management</h4>
+                    <p>Place warning signs, speed restrictions, and temporary markers in affected zones until repair is complete.</p>
+                </article>
+                <article class="solution-card">
+                    <h4>Monitoring Plan</h4>
+                    <p>Re-inspect this segment periodically and compare updated images to track deterioration progression.</p>
+                </article>
+            </div>
+
+            <div class="solution-timeline">
+                <div class="timeline-row">
+                    <div class="timeline-dot">1</div>
+                    <div class="timeline-text"><strong>Inspect:</strong> Validate crack depth, pothole spread, and drainage around the segment.</div>
+                </div>
+                <div class="timeline-row">
+                    <div class="timeline-dot">2</div>
+                    <div class="timeline-text"><strong>Stabilize:</strong> Add temporary traffic control to prevent safety incidents before full repair.</div>
+                </div>
+                <div class="timeline-row">
+                    <div class="timeline-dot">3</div>
+                    <div class="timeline-text"><strong>Repair:</strong> Apply <strong>{{maintenance}}</strong> with quality checks on compaction and bonding.</div>
+                </div>
+                <div class="timeline-row">
+                    <div class="timeline-dot">4</div>
+                    <div class="timeline-text"><strong>Verify:</strong> Capture a new image after repair and compare confidence/risk scores.</div>
+                </div>
+            </div>
+
+            <div id="dynamicSolution">
+                Generating personalized maintenance solution...
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clamp = (value) => Math.max(0, Math.min(100, Number(value) || 0));
+            const confidenceFill = document.querySelector('.confidence-fill');
+
+            const severity = "{{severity}}".toLowerCase();
+            const priority = "{{priority}}".toLowerCase();
+            const condition = "{{condition}}".toLowerCase();
+            const maintenance = "{{maintenance}}";
+            const confidence = clamp("{{confidence}}");
+
+            const revealCards = document.querySelectorAll('.reveal-card');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-view');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.18 });
+
+            revealCards.forEach((card) => revealObserver.observe(card));
+
+            if (confidenceFill) {
+                setTimeout(() => {
+                    confidenceFill.style.width = `${confidence}%`;
+                }, 240);
+            }
+
+            const animatePercent = (el, target, duration = 1100) => {
+                if (!el) return;
+                const start = performance.now();
+                const step = (time) => {
+                    const progress = Math.min((time - start) / duration, 1);
+                    const value = Math.round(progress * target);
+                    el.textContent = `${value}%`;
+                    if (progress < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            };
+
+            const toPercent = (val) => clamp(val);
+            const severityMap = { critical: 95, high: 80, medium: 60, low: 35 };
+            const priorityMap = { urgent: 95, veryhigh: 90, high: 80, medium: 58, low: 35 };
+            const conditionMap = { poor: 88, damaged: 82, fair: 56, good: 30, excellent: 12 };
+
+            const severityScore = toPercent(Object.entries(severityMap).find(([k]) => severity.includes(k))?.[1] ?? 45);
+            const priorityScore = toPercent(Object.entries(priorityMap).find(([k]) => priority.replace(/\s+/g, '').includes(k))?.[1] ?? 50);
+            const conditionScore = toPercent(Object.entries(conditionMap).find(([k]) => condition.includes(k))?.[1] ?? 48);
+
+            const setBar = (id, labelId, value) => {
+                const bar = document.getElementById(id);
+                const label = document.getElementById(labelId);
+                if (bar) bar.style.width = `${value}%`;
+                animatePercent(label, value, 1000);
+            };
+
+            setTimeout(() => {
+                setBar('severityScoreBar', 'severityScoreLabel', severityScore);
+                setBar('priorityScoreBar', 'priorityScoreLabel', priorityScore);
+                setBar('conditionScoreBar', 'conditionScoreLabel', conditionScore);
+
+                const donut = document.getElementById('confidenceDonut');
+                const donutValue = document.getElementById('confidenceDonutValue');
+                if (donut) donut.style.setProperty('--percent', confidence);
+                animatePercent(donutValue, confidence, 1200);
+            }, 320);
+
+            const summary = document.getElementById('predictionSummary');
+            if (summary) {
+                const eta = severity.includes('critical')
+                    ? '24-48 hours'
+                    : severity.includes('high')
+                        ? '3-7 days'
+                        : severity.includes('medium')
+                            ? '1-2 weeks'
+                            : 'normal maintenance cycle';
+
+                const confidenceNote = confidence < 70
+                    ? `Model confidence is ${confidence}%, so capture one extra image from a different angle before final budgeting.`
+                    : `Model confidence is ${confidence}%, so this recommendation can be used directly for maintenance planning.`;
+
+                summary.textContent = [
+                    `Condition: {{condition}}`,
+                    `Severity: {{severity}} | Priority: {{priority}}`,
+                    `Recommended action: {{maintenance}}`,
+                    `Suggested completion window: ${eta}.`,
+                    confidenceNote
+                ].join('\n');
+            }
+
+            const dynamicSolution = document.getElementById('dynamicSolution');
+            if (dynamicSolution) {
+                let message = `Recommended fix: ${maintenance}. Keep routine inspections every 30 days and document crack growth after repair.`;
+
+                if (severity.includes('critical')) {
+                    message = `Urgent solution needed: ${maintenance}. Block damaged lane sections immediately, schedule emergency rehabilitation within 24-48 hours, and deploy rapid pothole filling or full-depth patching to prevent structural failure.`;
+                } else if (severity.includes('high')) {
+                    message = `High-priority solution: ${maintenance}. Complete corrective repair within 3-7 days, improve drainage near the segment, and run follow-up inspection after first rainfall to verify repair durability.`;
+                } else if (severity.includes('medium')) {
+                    message = `Moderate solution: ${maintenance}. Plan preventive maintenance in the upcoming cycle, seal visible cracks, and perform monthly image-based monitoring to avoid escalation.`;
+                }
+
+                if (confidence < 70) {
+                    message += ` Confidence is ${confidence}%, so verify with one additional field image before final material allocation.`;
+                }
+
+                dynamicSolution.textContent = '';
+                let index = 0;
+                const typeStep = () => {
+                    dynamicSolution.textContent = message.slice(0, index);
+                    index += 1;
+                    if (index <= message.length) {
+                        setTimeout(typeStep, 15);
+                    }
+                };
+                setTimeout(typeStep, 250);
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+

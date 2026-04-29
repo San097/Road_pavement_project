@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account - Road Pavement Deterioration Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-single">
+<div class="card">
+    <h1>Create Account</h1>
+    <p class="sub">Road Pavement Detection System</p>
+
+    {% if error %}<div class="msg error">{{ error }}</div>{% endif %}
+    {% if info %}<div class="msg info">{{ info }}</div>{% endif %}
+
+    {% if google_enabled %}
+    <a href="{{ url_for('google_login') }}" class="social-btn"><span class="google-mark">G</span> Sign up with Google</a>
+    {% else %}
+    <div class="social-btn disabled"><span class="google-mark">G</span> Google sign-up not configured</div>
+    {% endif %}
+
+    <div class="divider">or create a local account</div>
+
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="field">
+            <label for="username">Username</label>
+            <div class="input-row">
+                <input id="username" type="text" name="username" placeholder="Choose username" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="email">Email</label>
+            <div class="input-row">
+                <input id="email" type="email" name="email" placeholder="Enter your email" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="password">Password</label>
+            <div class="input-row">
+                <input id="password" type="password" name="password" placeholder="Create password" required>
+                <button type="button" class="toggle-pass" data-target="password">SHOW</button>
+            </div>
+            <div id="password-strength" class="strength">Password strength: -</div>
+        </div>
+
+        <div class="field">
+            <label for="confirm-password">Confirm Password</label>
+            <div class="input-row">
+                <input id="confirm-password" type="password" name="confirm_password" placeholder="Confirm password" required>
+                <button type="button" class="toggle-pass" data-target="confirm-password">SHOW</button>
+            </div>
+        </div>
+
+        <button type="submit">Create Account</button>
+    </form>
+
+    <div class="requirements">Use at least 8 characters with uppercase, lowercase, and a number so login and password reset stay reliable.</div>
+
+    {% if not google_enabled %}
+    <div class="note">To enable Google sign-up, add valid <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> values in <code>.env</code>.</div>
+    {% endif %}
+
+    <div class="footer">
+        <a href="{{ url_for('login_page') }}">Back to Login</a>
+        <a href="{{ url_for('forgot_password') }}">Forgot Password</a>
+    </div>
+</div>
+
+<script>
+const toggles = document.querySelectorAll(".toggle-pass");
+toggles.forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+        const input = document.getElementById(toggle.dataset.target);
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        toggle.textContent = isPassword ? "HIDE" : "SHOW";
+    });
+});
+
+const password = document.getElementById("password");
+const indicator = document.getElementById("password-strength");
+password.addEventListener("input", () => {
+    const value = password.value;
+    let score = 0;
+    if (value.length >= 8) score += 1;
+    if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
+    if (/\d/.test(value)) score += 1;
+    if (/[^A-Za-z0-9]/.test(value)) score += 1;
+
+    const labels = ["Weak", "Fair", "Good", "Strong"];
+    indicator.textContent = value ? `Password strength: ${labels[Math.max(score - 1, 0)]}` : "Password strength: -";
+});
+</script>
+</body>
+</html>

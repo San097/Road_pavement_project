@@ -27,6 +27,8 @@ except ImportError:
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(BASE_DIR, "road_pavement_project", "ESC 12 Pavement Dataset.csv")
+ROOT_TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+ROOT_STATIC_DIR = os.path.join(BASE_DIR, "static")
 ENV_PATH = os.path.join(BASE_DIR, ".env")
 DATA_DIR = BASE_DIR
 UPLOAD_FOLDER = os.path.join(DATA_DIR, "uploads")
@@ -92,8 +94,8 @@ DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 app = Flask(
     __name__,
-    template_folder=os.path.join(BASE_DIR, "road_pavement_project", "templates"),
-    static_folder=os.path.join(BASE_DIR, "road_pavement_project", "static"),
+    template_folder=ROOT_TEMPLATE_DIR,
+    static_folder=ROOT_STATIC_DIR,
 )
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "road_project")
 app.config["SESSION_COOKIE_HTTPONLY"] = True

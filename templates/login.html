@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Road Pavement Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+<section class="hero">
+<h1>Road Pavement Deterioration Model</h1>
+<p>
+Sign in to continue, review dashboard insights, and submit road images for analysis.
+</p>
+<div class="feature-list">
+<h3>Access Flow</h3>
+<ol>
+<li><strong>Secure Login</strong><span>Use your username or email with your password.</span></li>
+<li><strong>Google Sign-In</strong><span>Create or access your account with Google when OAuth is configured.</span></li>
+<li><strong>Password Recovery</strong><span>If you forget your password, generate a reset link from the login page.</span></li>
+</ol>
+</div>
+</section>
+
+<section class="form-panel">
+<div class="card">
+<h2>Welcome back</h2>
+<p class="lead">Sign in to open your pavement dashboard.</p>
+
+{% if error %}
+<div class="status-message error">{{ error }}</div>
+{% endif %}
+
+{% if info %}
+<div class="status-message info">{{ info }}</div>
+{% endif %}
+
+{% if google_enabled %}
+<a href="{{ url_for('google_login') }}" class="social-btn"><span class="google-mark">G</span> Continue with Google</a>
+{% else %}
+<div class="social-btn disabled"><span class="google-mark">G</span> Google sign-in not configured</div>
+{% endif %}
+
+<div class="divider">or</div>
+
+<form method="POST" action="{{ url_for('login') }}">
+<div class="field">
+<label>Username or Email</label>
+<input type="text" name="username" placeholder="Enter your username or email" required>
+</div>
+
+<div class="field">
+<label>Password</label>
+<div class="password-wrap">
+<input id="password" type="password" name="password" placeholder="Enter your password" required>
+<button type="button" class="toggle-pass" id="toggle-password">SHOW</button>
+</div>
+</div>
+
+<button class="btn-primary" type="submit">Sign in</button>
+</form>
+
+<div class="inline-links">
+<a href="{{ url_for('forgot_password') }}">Forgot password?</a>
+</div>
+
+<div class="account-actions">
+<a href="{{ url_for('register') }}" class="create-account-btn">Create Local Account</a>
+</div>
+
+{% if not google_enabled %}
+<div class="helper-note">To enable Google sign-in, add valid <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> values in <code>.env</code>.</div>
+{% endif %}
+
+<p class="micro-copy">Local sign-in accepts either your username or your email address.</p>
+</div>
+</section>
+</div>
+<script>
+const toggleButton = document.getElementById("toggle-password");
+const passwordInput = document.getElementById("password");
+if (toggleButton && passwordInput) {
+    toggleButton.addEventListener("click", () => {
+        const hidden = passwordInput.type === "password";
+        passwordInput.type = hidden ? "text" : "password";
+        toggleButton.textContent = hidden ? "HIDE" : "SHOW";
+    });
+}
+</script>
+</body>
+</html>

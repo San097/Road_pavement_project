@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prediction History</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<div>
+<h1>Prediction History</h1>
+<p>Review all pavement assessments and maintenance suggestions in one place.</p>
+</div>
+<a href="{{ url_for('dashboard') }}" class="back-btn">Back to Dashboard</a>
+</div>
+
+<div class="table-wrap">
+<table>
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Condition</th>
+<th>Severity</th>
+<th>Maintenance</th>
+<th>Priority</th>
+<th>Confidence</th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in history %}
+<tr>
+<td>{{ item.timestamp }}</td>
+<td>{{ item.condition }}</td>
+<td>{{ item.severity }}</td>
+<td>{{ item.maintenance }}</td>
+<td>
+{% set priority_text = (item.priority|string|lower) %}
+<span class="badge {% if 'critical' in priority_text %}critical{% elif 'high' in priority_text %}high{% elif 'medium' in priority_text %}medium{% else %}low{% endif %}">
+{{ item.priority }}
+</span>
+</td>
+<td>{{ item.confidence }}%</td>
+</tr>
+{% else %}
+<tr>
+<td colspan="6" class="empty-state">No history records found yet. Run a prediction from your dashboard to see results here.</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+</div>
+
+</body>
+</html>
