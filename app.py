@@ -33,6 +33,11 @@ UPLOAD_FOLDER = os.path.join(DATA_DIR, "uploads")
 AUTH_STORE_PATH = os.path.join(DATA_DIR, "auth_store.json")
 LEGACY_DATABASE_PATHS = []
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+FRONTEND_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("FRONTEND_ORIGINS", os.getenv("FRONTEND_ORIGIN", "")).split(",")
+    if origin.strip()
+]
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -92,11 +97,26 @@ app = Flask(
 )
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "road_project")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SAMESITE"] = os.getenv(
+    "SESSION_COOKIE_SAMESITE",
+    "None" if FRONTEND_ORIGINS else "Lax",
+)
 app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "0") == "1"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+
+@app.after_request
+def add_frontend_cors_headers(response):
+    origin = (request.headers.get("Origin") or "").rstrip("/")
+    if origin and origin in FRONTEND_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Vary"] = "Origin"
+    return response
 
 
 try:
@@ -422,7 +442,7 @@ if not os.path.exists(CSV_PATH):
 
 
 def auth_database_enabled():
-    return bool(DATABASE_URL)
+    return DATABASE_URL.startswith(("postgresql://", "postgres://"))
 
 
 def get_db_connection():
