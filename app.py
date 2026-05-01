@@ -112,7 +112,9 @@ app.config["SESSION_COOKIE_SAMESITE"] = os.getenv(
     "SESSION_COOKIE_SAMESITE",
     "None" if FRONTEND_ORIGINS else "Lax",
 )
-app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "0") == "1"
+# Automatically enable secure cookies in production (Render/Vercel/GCP)
+is_production = any(os.getenv(key) for key in ("VERCEL", "RENDER", "K_SERVICE", "GAE_RUNTIME"))
+app.config["SESSION_COOKIE_SECURE"] = is_production or os.getenv("SESSION_COOKIE_SECURE", "0") == "1"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -995,9 +997,12 @@ def get_repair_summary(row):
 
 
 def google_redirect_uri():
+    """Generate the redirect URI, preferring the request-based URL over env config."""
     override = (os.getenv("GOOGLE_REDIRECT_URI", "") or "").strip()
-    if override:
+    # Only use override if it's not a localhost placeholder (which breaks on production)
+    if override and not override.startswith(("http://localhost", "http://127.0.0.1")):
         return override
+    # Auto-generate from current request to ensure correct domain/protocol
     return url_for("google_callback", _external=True)
 
 
@@ -1151,6 +1156,7 @@ def google_login():
     if not google_oauth_ready():
         return redirect(url_for("login_page", error="Google sign-in is not configured yet. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET first."))
 
+    session.permanent = True
     state = secrets.token_urlsafe(24)
     session["google_oauth_state"] = state
     params = {
