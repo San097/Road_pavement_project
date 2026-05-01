@@ -499,7 +499,7 @@ body {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
   justify-content: center;
 }
 
@@ -508,44 +508,47 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 16px 26px;
+  padding: 18px 32px;
   border: 2px solid transparent;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(0, 194, 255, 0.18) 0%, rgba(4, 18, 34, 0.92) 100%);
-  color: #d9fbff;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.22) 0%, rgba(0, 245, 176, 0.08) 100%);
+  color: #e8fbff;
   font-family: inherit;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 24px rgba(0, 194, 255, 0.12), inset 0 0 0 1px rgba(0, 194, 255, 0.2);
+  box-shadow: 0 0 28px rgba(0, 194, 255, 0.14), inset 0 0 0 1px rgba(0, 194, 255, 0.24);
   position: relative;
   overflow: hidden;
+  flex: 1;
+  max-width: 280px;
+  min-width: 200px;
 }
 
 .upload-trigger::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   transform: translateX(-100%);
 }
 
 .upload-trigger:hover::before {
   transform: translateX(100%);
-  transition: transform 0.5s ease;
+  transition: transform 0.6s ease;
 }
 
 .upload-trigger:hover {
-  transform: translateY(-2px);
-  border-color: #00c2ff;
-  box-shadow: 0 0 34px rgba(0, 194, 255, 0.24), inset 0 0 0 1px rgba(0, 194, 255, 0.4);
-  background: linear-gradient(135deg, rgba(0, 194, 255, 0.28) 0%, rgba(4, 18, 34, 0.98) 100%);
+  transform: translateY(-3px);
+  border-color: #00f5b0;
+  box-shadow: 0 0 42px rgba(0, 194, 255, 0.28), inset 0 0 0 2px rgba(0, 245, 176, 0.3);
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.32) 0%, rgba(0, 245, 176, 0.18) 100%);
 }
 
 .upload-trigger:active {
-  transform: translateY(0);
-  box-shadow: 0 0 16px rgba(0, 194, 255, 0.16), inset 0 0 0 2px rgba(0, 194, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(0, 194, 255, 0.18), inset 0 0 0 2px rgba(0, 245, 176, 0.2);
 }
 
 .upload-box {
@@ -1173,12 +1176,14 @@ body.camera-open {
   }
 
   .upload-actions {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .upload-trigger {
     width: 100%;
-    padding: 18px 24px;
+    max-width: none;
+    padding: 16px 24px;
     font-size: 1rem;
   }
 
@@ -1362,10 +1367,6 @@ body.camera-open {
               <button type="button" class="upload-trigger" id="camera-trigger">
                 <i class="fas fa-camera"></i>
                 Use Camera
-              </button>
-              <button type="button" class="upload-trigger" id="file-upload-trigger">
-                <i class="fas fa-cloud-arrow-up"></i>
-                Upload File
               </button>
             </div>
 
@@ -1979,16 +1980,6 @@ if (cameraTrigger) {
       cameraTrigger.disabled = false;
       cameraTrigger.innerHTML = '<i class="fas fa-camera"></i> Use Camera';
     });
-  });
-}
-
-const fileUploadTrigger = document.getElementById('file-upload-trigger');
-if (fileUploadTrigger) {
-  fileUploadTrigger.addEventListener('click', () => {
-    if (fileInput) {
-      fileInput.removeAttribute('capture');
-      fileInput.click();
-    }
   });
 }
 
