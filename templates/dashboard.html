@@ -485,78 +485,162 @@ body {
     #071726;
   border-radius: 24px;
   padding: 22px;
+  transition: all 0.3s ease;
+}
+
+.upload-shell.drag-over {
+  border-color: #00c2ff;
+  border-style: solid;
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.2) 0%, rgba(4, 18, 34, 0.98) 100%);
+  box-shadow: 0 0 48px rgba(0, 194, 255, 0.28), inset 0 0 0 2px rgba(0, 194, 255, 0.2);
 }
 
 .upload-actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 18px;
+  justify-content: center;
 }
 
 .upload-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border: 1px solid rgba(0, 194, 255, 0.24);
-  border-radius: 14px;
-  background: rgba(4, 18, 34, 0.92);
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 26px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.18) 0%, rgba(4, 18, 34, 0.92) 100%);
   color: #d9fbff;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 24px rgba(0, 194, 255, 0.12), inset 0 0 0 1px rgba(0, 194, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-trigger::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+}
+
+.upload-trigger:hover::before {
+  transform: translateX(100%);
+  transition: transform 0.5s ease;
 }
 
 .upload-trigger:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   border-color: #00c2ff;
-  box-shadow: 0 0 26px rgba(0, 194, 255, 0.12);
+  box-shadow: 0 0 34px rgba(0, 194, 255, 0.24), inset 0 0 0 1px rgba(0, 194, 255, 0.4);
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.28) 0%, rgba(4, 18, 34, 0.98) 100%);
+}
+
+.upload-trigger:active {
+  transform: translateY(0);
+  box-shadow: 0 0 16px rgba(0, 194, 255, 0.16), inset 0 0 0 2px rgba(0, 194, 255, 0.3);
 }
 
 .upload-box {
   display: grid;
   place-items: center;
   text-align: center;
-  min-height: 250px;
-  border-radius: 20px;
-  background: rgba(4, 18, 34, 0.9);
-  border: 1px solid rgba(0, 194, 255, 0.2);
-  padding: 28px;
+  min-height: 280px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.08) 0%, rgba(4, 18, 34, 0.95) 100%);
+  border: 2px dashed rgba(0, 194, 255, 0.3);
+  padding: 36px;
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 28px rgba(0, 194, 255, 0.1), inset 0 0 0 1px rgba(0, 194, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 245, 176, 0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.upload-box:hover::before {
+  opacity: 1;
 }
 
 .upload-box:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: #00c2ff;
-  box-shadow: 0 0 34px rgba(0, 194, 255, 0.14);
+  border-style: solid;
+  box-shadow: 0 0 48px rgba(0, 194, 255, 0.24), inset 0 0 0 1px rgba(0, 194, 255, 0.2);
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.15) 0%, rgba(4, 18, 34, 0.98) 100%);
+}
+
+.upload-box:active {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(0, 194, 255, 0.16), inset 0 0 0 2px rgba(0, 194, 255, 0.2);
 }
 
 .upload-icon {
-  width: 74px;
-  height: 74px;
-  border-radius: 24px;
+  width: 88px;
+  height: 88px;
+  border-radius: 28px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(0, 194, 255, 0.18) 0%, rgba(0, 245, 176, 0.18) 100%);
-  color: #8ef9ff;
-  font-size: 1.6rem;
-  margin-bottom: 16px;
-  box-shadow: inset 0 0 0 1px rgba(0, 194, 255, 0.18), 0 0 28px rgba(0, 194, 255, 0.14);
+  background: linear-gradient(135deg, rgba(0, 194, 255, 0.28) 0%, rgba(0, 245, 176, 0.18) 100%);
+  color: #46e0ff;
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0 0 2px rgba(0, 194, 255, 0.18), 0 0 36px rgba(0, 194, 255, 0.18), 0 0 48px rgba(0, 245, 176, 0.08);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.upload-box:hover .upload-icon {
+  animation: floatHover 0.6s ease-in-out;
+}
+
+@keyframes floatHover {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.05);
+  }
+  100% {
+    transform: translateY(-8px) scale(1);
+  }
 }
 
 .upload-box h4 {
-  font-size: 1.35rem;
-  margin-bottom: 10px;
+  font-size: 1.6rem;
+  margin-bottom: 14px;
+  font-weight: 800;
+  color: #fff;
 }
 
 .upload-box p {
   color: var(--muted);
-  max-width: 420px;
-  line-height: 1.7;
+  max-width: 480px;
+  line-height: 1.8;
+  font-size: 0.98rem;
 }
 
 .upload-box input[type="file"] {
@@ -1088,6 +1172,31 @@ body.camera-open {
     width: 100%;
   }
 
+  .upload-actions {
+    flex-direction: column;
+  }
+
+  .upload-trigger {
+    width: 100%;
+    padding: 18px 24px;
+    font-size: 1rem;
+  }
+
+  .upload-box {
+    min-height: 240px;
+    padding: 24px;
+  }
+
+  .upload-icon {
+    width: 72px;
+    height: 72px;
+    font-size: 1.8rem;
+  }
+
+  .upload-box h4 {
+    font-size: 1.35rem;
+  }
+
   .camera-modal {
     padding: 16px;
   }
@@ -1254,6 +1363,10 @@ body.camera-open {
                 <i class="fas fa-camera"></i>
                 Use Camera
               </button>
+              <button type="button" class="upload-trigger" id="file-upload-trigger">
+                <i class="fas fa-cloud-arrow-up"></i>
+                Upload File
+              </button>
             </div>
 
             <label for="image-upload" class="upload-box">
@@ -1267,8 +1380,7 @@ body.camera-open {
             </label>
 
             <div class="upload-guidance">
-              <strong>Accepted input:</strong> broken road surfaces with visible cracks, potholes, rutting, or distressed pavement.
-              Selfies, people, indoor scenes, and random images will be rejected.
+              <strong>Accepted input:</strong> Drag and drop an image, use the camera, upload from file, or click the upload area. Only broken road surfaces with visible cracks, potholes, rutting, or distressed pavement will be analyzed.
             </div>
 
             <div class="upload-preview" id="upload-preview">
@@ -1870,6 +1982,16 @@ if (cameraTrigger) {
   });
 }
 
+const fileUploadTrigger = document.getElementById('file-upload-trigger');
+if (fileUploadTrigger) {
+  fileUploadTrigger.addEventListener('click', () => {
+    if (fileInput) {
+      fileInput.removeAttribute('capture');
+      fileInput.click();
+    }
+  });
+}
+
 if (capturePhoto) {
   capturePhoto.addEventListener('click', (e) => {
     if (!cameraReadyForCapture) {
@@ -1938,6 +2060,49 @@ document.addEventListener('visibilitychange', () => {
 
 resetSelectedFile();
 clearUploadFeedback();
+
+// Drag and drop functionality
+if (fileInput && predictionForm) {
+  const uploadShell = predictionForm.querySelector('.upload-shell');
+  
+  if (uploadShell) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadShell.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadShell.addEventListener(eventName, () => {
+        uploadShell.style.borderColor = '#00c2ff';
+        uploadShell.style.background = 'linear-gradient(135deg, rgba(0, 194, 255, 0.18) 0%, rgba(4, 18, 34, 0.95) 100%)';
+        uploadShell.style.boxShadow = '0 0 48px rgba(0, 194, 255, 0.24), inset 0 0 0 1px rgba(0, 194, 255, 0.2)';
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadShell.addEventListener(eventName, () => {
+        uploadShell.style.borderColor = 'rgba(0, 194, 255, 0.3)';
+        uploadShell.style.background = 'radial-gradient(circle at top right, rgba(0, 245, 176, 0.12), transparent 30%), #071726';
+        uploadShell.style.boxShadow = 'none';
+      }, false);
+    });
+
+    uploadShell.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files && files.length > 0) {
+        fileInput.files = files;
+        clearUploadFeedback();
+        applySelectedFile(files[0], 'Dragged');
+      }
+    }, false);
+  }
+}
 </script>
 </body>
 </html>
