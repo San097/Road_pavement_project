@@ -420,9 +420,6 @@ def username_is_valid(username):
 
 
 def google_oauth_ready():
-    enabled = os.getenv("GOOGLE_OAUTH_ENABLED", "").strip().lower()
-    if enabled not in {"1", "true", "yes"}:
-        return False
     client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
     return (
