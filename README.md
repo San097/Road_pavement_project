@@ -132,22 +132,6 @@ These are descriptive statistics for the supplied CSV, not evidence of model acc
 
 ---
 
-## 🎥 Project Demonstration
-
-<p align="center">
-  <a href="project-demo.mp4">
-    <img src="demo-preview.gif" alt="Animated preview of the project demo" width="700">
-  </a>
-</p>
-
-<p align="center">
-  <a href="project-demo.mp4">▶️ <strong>Watch the full demo video</strong></a>
-</p>
-
-> 💡 **Tip:** GitHub plays a video inline when it is uploaded through the GitHub web editor. To embed the full video player, edit this README on GitHub, drag `project-demo.mp4` into the editor, and keep the generated link on its own line here.
-
----
-
 # 🌐 Deployment
 
 The application is deployed on **Vercel** and is publicly accessible:
