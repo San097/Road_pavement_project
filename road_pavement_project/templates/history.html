@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prediction History</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+min-height:100vh;
+padding:30px;
+color:white;
+}
+
+/* Container */
+
+.container{
+background:white;
+color:#333;
+padding:30px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+max-width:1200px;
+margin:auto;
+}
+
+/* Header */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.header h1{
+color:#2c5364;
+}
+
+/* Button */
+
+.back-btn{
+text-decoration:none;
+background:linear-gradient(135deg,#36d1dc,#5b86e5);
+color:white;
+padding:10px 20px;
+border-radius:8px;
+font-weight:600;
+transition:0.3s;
+}
+
+.back-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Table */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+overflow:hidden;
+border-radius:10px;
+}
+
+thead{
+background:linear-gradient(135deg,#36d1dc,#5b86e5);
+color:white;
+}
+
+th,td{
+padding:15px;
+text-align:center;
+}
+
+th{
+font-weight:600;
+letter-spacing:0.5px;
+}
+
+tbody tr{
+border-bottom:1px solid #eee;
+transition:0.3s;
+}
+
+tbody tr:hover{
+background:#f5f8ff;
+transform:scale(1.01);
+}
+
+td{
+font-size:14px;
+}
+
+/* Status Colors */
+
+td:nth-child(2){
+font-weight:600;
+color:#2c5364;
+}
+
+td:nth-child(4){
+color:#ff6b6b;
+font-weight:600;
+}
+
+td:nth-child(5){
+color:#ffa502;
+font-weight:600;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+table{
+font-size:12px;
+}
+
+th,td{
+padding:10px;
+}
+
+.header{
+flex-direction:column;
+gap:10px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>📊 Prediction History</h1>
+<a href="{{ url_for('dashboard') }}" class="back-btn">Back to Dashboard</a>
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Condition</th>
+<th>Severity</th>
+<th>Maintenance</th>
+<th>Priority</th>
+<th>Confidence</th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in history %}
+<tr>
+<td>{{ item.timestamp }}</td>
+<td>{{ item.condition }}</td>
+<td>{{ item.severity }}</td>
+<td>{{ item.maintenance }}</td>
+<td>{{ item.priority }}</td>
+<td>{{ item.confidence }}%</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

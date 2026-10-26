@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - Road Pavement Deterioration Model</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #13151a;
+            color: #0f172a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            background: #131212;
+            border: 1px solid #131414;
+            border-radius: 26px;
+            margin: 24px auto 0;
+            max-width: 1180px;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.02em;
+            color: #c2c3c5;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .user-welcome {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .user-welcome strong {
+            color: #0f172a;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: rgb(19, 18, 18);
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 16px 32px rgba(239, 68, 68, 0.25);
+            transition: transform 0.25s ease;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            max-width: 1180px;
+            margin: 30px auto 40px;
+            padding: 0 20px 20px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 24px;
+        }
+
+        .preview-card,
+        .stats-panel,
+        .details-panel {
+            background: #101010;
+            border: 1px solid #161718;
+            border-radius: 24px;
+            padding: 26px;
+            box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
+        }
+
+        .preview-card h2,
+        .stats-panel h2,
+        .details-panel h2 {
+            margin: 0 0 16px;
+            font-size: 24px;
+            color: #18191b;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 22px;
+            object-fit: cover;
+            min-height: 340px;
+            background: #f8fafc;
+            box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9);
+        }
+
+        .preview-placeholder {
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 18px;
+            text-align: center;
+            padding: 24px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .preview-caption {
+            margin-top: 18px;
+            color: #cbd5ff;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .stats-panel {
+            display: grid;
+            gap: 18px;
+        }
+
+        .stat-card {
+            position: relative;
+            padding: 20px 22px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 65%);
+            pointer-events: none;
+        }
+
+        .stat-card h4 {
+            margin: 0 0 10px;
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #a5b4fc;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 30px;
+            color: #ffffff;
+            font-weight: 700;
+            line-height: 1.05;
+        }
+
+        .stat-note {
+            margin-top: 10px;
+            color: #cbd5ff;
+            font-size: 13px;
+        }
+
+        .summary-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-top: 14px;
+            padding: 18px 22px;
+            background: rgba(11, 11, 11, 0.35);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .summary-strip p {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 15px;
+        }
+
+        .summary-strip strong {
+            color: #a7f3d0;
+            font-weight: 700;
+        }
+
+        .details-panel {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .detail-card {
+            padding: 22px;
+            border-radius: 20px;
+            background: #34554a;
+            border: 1px solid #3b6366;
+        }
+
+        .detail-card h3 {
+            margin: 0 0 16px;
+            color: #0f172a;
+            font-size: 18px;
+        }
+
+        .detail-info {
+            color: #020b18;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .metric-value {
+            color: #0f172a;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .confidence-bar {
+            margin-top: 16px;
+            height: 14px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .sub-image-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: #4e6781;
+            border: 1px solid #08090a;
+        }
+
+        .sub-image {
+            width: 120px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .sub-image-text {
+            color: #010914;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34d399 0%, #2563eb 100%);
+            width: 0;
+            transition: width 0.5s ease;
+        }
+
+        .actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 999px;
+            text-decoration: none;
+            padding: 14px 26px;
+            font-weight: 700;
+            transition: transform 0.25s ease, background 0.25s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #695656;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .severity-badge {
+            display: inline-flex;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-critical {
+            background: rgba(254, 226, 226, 0.18);
+            color: #fecaca;
+        }
+
+        .badge-high {
+            background: rgba(251, 191, 36, 0.18);
+            color: #facc15;
+        }
+
+        .badge-medium {
+            background: rgba(59, 130, 246, 0.18);
+            color: #bfdbfe;
+        }
+
+        .badge-low {
+            background: rgba(16, 185, 129, 0.18);
+            color: #a7f3d0;
+        }
+
+        @media (max-width: 980px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style> 
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>🛣️ Road Pavement Deterioration Model</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-welcome">
+                Welcome, <strong>Admin</strong>!
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="result-grid">
+            <section class="preview-card">
+                <h2>Prediction Result</h2>
+                {% if image_url %}
+                <img src="{{ image_url }}" alt="Uploaded road image" class="preview-image" />
+                {% else %}
+                <div class="preview-placeholder">📷 Uploaded image will appear here once the prediction is complete.</div>
+                {% endif %}
+                <p class="preview-caption">This preview shows the road image used for the current deterioration prediction.</p>
+            </section>
+
+            <aside class="stats-panel">
+                <div class="stat-card">
+                    <h4>Condition</h4>
+                    <p>{{condition}}</p>
+                    <p class="stat-note">Road surface condition detected by the model.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Severity Level</h4>
+                    <div class="metric-value">
+                        {% if severity == "Critical" %}
+                            <span class="severity-badge badge-critical">{{severity}}</span>
+                        {% elif severity == "High" %}
+                            <span class="severity-badge badge-high">{{severity}}</span>
+                        {% elif severity == "Medium" %}
+                            <span class="severity-badge badge-medium">{{severity}}</span>
+                        {% else %}
+                            <span class="severity-badge badge-low">{{severity}}</span>
+                        {% endif %}
+                    </div>
+                    <p class="stat-note">Estimated severity of pavement deterioration.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Maintenance Required</h4>
+                    <p>{{maintenance}}</p>
+                    <p class="stat-note">Recommended action based on the prediction.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Priority Level</h4>
+                    <p>{{priority}}</p>
+                    <p class="stat-note">The urgency level assigned by the model.</p>
+                </div>
+            </aside>
+        </div>
+
+        <section class="details-panel">
+            <div class="detail-card">
+                <h3>Analysis Summary</h3>
+                <p class="detail-info">The pavement deterioration analysis has been completed successfully. Review the detailed metrics and recommendations below to plan maintenance actions.</p>
+                <div class="summary-strip">
+                    <p>Maintenance Required <strong>{{maintenance}}</strong></p>
+                    <p>Confidence <strong>{{confidence}}%</strong></p>
+                </div>
+                <div class="sub-image-card">
+                    <img src="https://images.unsplash.com/photo-1508780709619-79562169bc64?auto=format&fit=crop&w=400&q=80" alt="Road analysis graphic" class="sub-image" />
+                    <div class="sub-image-text">A visual snapshot of road surface analysis and deterioration detection results.</div>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" data-confidence="{{ confidence }}"></div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h3>Repair Summary - Cracks & Potholes</h3>
+                <div class="detail-info" style="white-space: pre-wrap; line-height: 1.8; font-family: 'Courier New', monospace; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px;">{{detail}}</div>
+                <div class="summary-strip" style="margin-top: 20px;">
+                    <p>Segment ID: <strong>{{segment_id}}</strong></p>
+                    <p>Road Type: <strong>{{road_type}}</strong></p>
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Analyze Another Image</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const confidenceFill = document.querySelector('.confidence-fill');
+            if (confidenceFill) {
+                const value = confidenceFill.dataset.confidence || '0';
+                confidenceFill.style.width = `${value}%`;
+            }
+        });
+    </script>
+</body>
+</html>

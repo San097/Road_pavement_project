@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road Pavement Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #eef4ff;
+  --ink: #122033;
+  --muted: #5c6b82;
+  --panel: rgba(255, 255, 255, 0.84);
+  --panel-solid: #ffffff;
+  --line: rgba(148, 163, 184, 0.28);
+  --brand: #0f62fe;
+  --brand-deep: #093fb1;
+  --navy: #09162b;
+  --teal: #0f9d8a;
+  --amber: #f59e0b;
+  --rose: #e85d75;
+  --shadow: 0 24px 80px rgba(15, 23, 42, 0.14);
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(15, 98, 254, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(15, 157, 138, 0.18), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #081528 0%, #10284b 100%);
+  color: #e2e8f0;
+  padding: 28px 22px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar::after {
+  content: "";
+  position: absolute;
+  inset: auto -60px -120px auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.18);
+  filter: blur(10px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 34px;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #2dd4bf 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 14px 26px rgba(37, 99, 235, 0.3);
+}
+
+.brand span {
+  display: block;
+}
+
+.brand .title {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.brand .subtitle {
+  font-size: 0.9rem;
+  color: #9fb4d6;
+}
+
+.nav-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #7f96ba;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c4d2ea;
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 16px;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.sidebar-card {
+  margin-top: 28px;
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-card h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.sidebar-card p {
+  color: #c5d4ea;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.sidebar-card .mini-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.14);
+  color: #9df6e8;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.content {
+  padding: 32px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.welcome h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  margin-bottom: 10px;
+}
+
+.welcome p {
+  color: var(--muted);
+  max-width: 720px;
+  line-height: 1.7;
+}
+
+.profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(14px);
+  border-radius: 22px;
+  padding: 14px 18px;
+  box-shadow: 0 12px 30px rgba(148, 163, 184, 0.18);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #2563eb 0%, #0f9d8a 100%);
+  color: #fff;
+  font-weight: 800;
+}
+
+.profile-chip small {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.profile-chip strong {
+  font-size: 1rem;
+}
+
+.info-banner {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba(219, 234, 254, 0.9);
+  color: #1543a6;
+  border: 1px solid #bfdbfe;
+  font-weight: 700;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.glass-card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hero-card {
+  padding: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.22), transparent 28%),
+    linear-gradient(135deg, rgba(15, 98, 254, 0.95) 0%, rgba(8, 21, 40, 0.95) 100%);
+  color: #f8fbff;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  right: -40px;
+  bottom: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.hero-card h2 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.12;
+  max-width: 560px;
+  margin-bottom: 12px;
+}
+
+.hero-card p {
+  max-width: 620px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.hero-stat {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-stat strong {
+  display: block;
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.hero-stat span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+}
+
+.status-card {
+  padding: 24px;
+}
+
+.section-kicker {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #6480a8;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.status-card h3 {
+  font-size: 1.45rem;
+  margin-bottom: 14px;
+}
+
+.status-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(241, 245, 249, 0.85);
+}
+
+.status-row span {
+  color: var(--muted);
+}
+
+.status-row strong {
+  color: var(--ink);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 22px;
+}
+
+.panel {
+  padding: 26px;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.panel-head h3 {
+  font-size: 1.45rem;
+  margin-bottom: 6px;
+}
+
+.panel-head p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.upload-shell {
+  border: 2px dashed #bfdbfe;
+  background:
+    radial-gradient(circle at top right, rgba(15, 98, 254, 0.08), transparent 30%),
+    #f8fbff;
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.upload-box {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  min-height: 250px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(191, 219, 254, 0.8);
+  padding: 28px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upload-box:hover {
+  transform: translateY(-2px);
+  border-color: #60a5fa;
+  box-shadow: 0 18px 36px rgba(59, 130, 246, 0.12);
+}
+
+.upload-icon {
+  width: 74px;
+  height: 74px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%);
+  color: var(--brand);
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+}
+
+.upload-box h4 {
+  font-size: 1.35rem;
+  margin-bottom: 10px;
+}
+
+.upload-box p {
+  color: var(--muted);
+  max-width: 420px;
+  line-height: 1.7;
+}
+
+.upload-box input[type="file"] {
+  display: none;
+}
+
+.upload-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.file-name {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 18px 34px rgba(15, 98, 254, 0.24);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.summary-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.summary-card .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  color: #fff;
+}
+
+.summary-card.blue .icon { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.summary-card.teal .icon { background: linear-gradient(135deg, #0f9d8a, #2dd4bf); }
+.summary-card.amber .icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.summary-card.rose .icon { background: linear-gradient(135deg, #e85d75, #fb7185); }
+
+.summary-card span {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 1.35rem;
+  margin-bottom: 6px;
+}
+
+.summary-card p {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.94rem;
+}
+
+.visual-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 22px;
+  margin-top: 14px;
+}
+
+.tips-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.tip {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.tip i {
+  margin-top: 3px;
+  color: var(--brand);
+}
+
+.tip strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tip p {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.94rem;
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+
+  .content {
+    padding: 24px;
+  }
+
+  .hero-grid,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    flex-direction: column;
+  }
+
+  .hero-stats,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .panel,
+  .status-card,
+  .hero-card {
+    padding: 20px;
+  }
+
+  .upload-meta {
+    align-items: stretch;
+  }
+
+  .cta-btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">
+        <i class="fas fa-road"></i>
+      </div>
+      <div>
+        <span class="title">Road AI</span>
+        <span class="subtitle">Pavement Insight Center</span>
+      </div>
+    </div>
+
+    <div class="nav-label">Navigation</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('dashboard') }}" class="active"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a></li>
+        <li><a href="{{ url_for('history') }}"><i class="fas fa-clock-rotate-left"></i><span>History</span></a></li>
+        <li><a href="{{ url_for('logout') }}"><i class="fas fa-arrow-right-from-bracket"></i><span>Logout</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-card">
+      <h3>System Snapshot</h3>
+      <p>Track road quality faster with image-based analysis, cleaner reports, and one-click access to previous scans.</p>
+      <div class="mini-stat">
+        <i class="fas fa-signal"></i>
+        <span>Analysis ready</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="welcome">
+        <h1>Pavement Dashboard</h1>
+        <p>Upload a road surface image, run instant visual analysis, and move from inspection to repair planning in a much clearer workflow.</p>
+      </div>
+
+      <div class="profile-chip">
+        <div class="avatar">{{ (session.get('user', 'U')[:1] or 'U')|upper }}</div>
+        <div>
+          <small>Signed in as</small>
+          <strong>{{ session.get('user', 'User') }}</strong>
+        </div>
+      </div>
+    </header>
+
+    {% if info %}
+    <div class="info-banner">
+      <i class="fas fa-circle-check"></i>
+      {{ info }}
+    </div>
+    {% endif %}
+
+    <section class="hero-grid">
+      <div class="hero-card glass-card">
+        <div class="eyebrow">
+          <i class="fas fa-wave-square"></i>
+          Smart surface intelligence
+        </div>
+        <h2>Turn road images into condition insights with a cleaner, faster dashboard.</h2>
+        <p>The workspace is designed to help you upload, review, and act on pavement condition data without hunting through cluttered screens.</p>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong>PCI Focus</strong>
+            <span>Quick visibility into road condition quality</span>
+          </div>
+          <div class="hero-stat">
+            <strong>IRI + Rutting</strong>
+            <span>Better context for severity and repair planning</span>
+          </div>
+          <div class="hero-stat">
+            <strong>Instant Results</strong>
+            <span>Jump directly from upload to prediction output</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card glass-card">
+        <div class="section-kicker">Today</div>
+        <h3>Inspection Overview</h3>
+        <p style="color: var(--muted); line-height: 1.7;">Everything important is surfaced here first, so users can understand the workflow before starting analysis.</p>
+        <div class="status-list">
+          <div class="status-row">
+            <span>Model status</span>
+            <strong>Ready to analyze</strong>
+          </div>
+          <div class="status-row">
+            <span>Recommended input</span>
+            <strong>Clear road surface image</strong>
+          </div>
+          <div class="status-row">
+            <span>Output flow</span>
+            <strong>Prediction, severity, repair summary</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="panel glass-card">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">Image Upload</div>
+            <h3>Start a New Road Scan</h3>
+            <p>Select a pavement image and run the model. The interface will take you to the prediction screen once processing is complete.</p>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('predict') }}" enctype="multipart/form-data">
+          <div class="upload-shell">
+            <label for="image-upload" class="upload-box">
+              <div>
+                <div class="upload-icon">
+                  <i class="fas fa-cloud-arrow-up"></i>
+                </div>
+                <h4>Drop image here or click to browse</h4>
+                <p>Use a road surface photo with visible cracks, rutting, or damaged sections for more meaningful output.</p>
+              </div>
+              <input id="image-upload" type="file" name="image" accept="image/*" required>
+            </label>
+
+            <div class="upload-meta">
+              <div class="file-name" id="file-name">No image selected yet</div>
+              <button type="submit" class="cta-btn">
+                <i class="fas fa-magnifying-glass-chart"></i>
+                Analyze Pavement
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="summary-grid">
+          <div class="summary-card blue">
+            <div class="icon"><i class="fas fa-road-circle-check"></i></div>
+            <span>Condition Tracking</span>
+            <strong>Surface quality</strong>
+            <p>Spot whether the uploaded segment appears stable, fair, poor, or urgent for maintenance.</p>
+          </div>
+          <div class="summary-card teal">
+            <div class="icon"><i class="fas fa-chart-line"></i></div>
+            <span>Performance</span>
+            <strong>Quick severity view</strong>
+            <p>See crack severity and maintenance urgency in a compact, decision-friendly format.</p>
+          </div>
+          <div class="summary-card amber">
+            <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <span>Repair Priority</span>
+            <strong>Action guidance</strong>
+            <p>Support faster planning by surfacing issues that may need routine or immediate repair.</p>
+          </div>
+          <div class="summary-card rose">
+            <div class="icon"><i class="fas fa-file-waveform"></i></div>
+            <span>Output Report</span>
+            <strong>Prediction summary</strong>
+            <p>Each run feeds a clearer report view so you can interpret the model result with less friction.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass-card">
+        <div class="panel-head">
+          <div>
+            <div class="section-kicker">Preview</div>
+            <h3>Analysis Workspace</h3>
+            <p>This area gives users visual context and a few practical tips before they submit a road image.</p>
+          </div>
+        </div>
+
+        <div class="visual-card">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Pavement_cracks_%2815736896886%29.jpg" alt="Pavement sample">
+        </div>
+
+        <div class="tips-list">
+          <div class="tip">
+            <i class="fas fa-camera"></i>
+            <div>
+              <strong>Capture clearly</strong>
+              <p>Try to avoid blurry or very dark images so pavement distress is easier to detect.</p>
+            </div>
+          </div>
+          <div class="tip">
+            <i class="fas fa-layer-group"></i>
+            <div>
+              <strong>Keep the surface centered</strong>
+              <p>Road defects should take up most of the frame for better analysis quality.</p>
+            </div>
+          </div>
+          <div class="tip">
+            <i class="fas fa-bolt"></i>
+            <div>
+              <strong>Use the history page</strong>
+              <p>After multiple uploads, compare past scans to review changes over time.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const fileInput = document.getElementById('image-upload');
+const fileName = document.getElementById('file-name');
+
+if (fileInput && fileName) {
+  fileInput.addEventListener('change', function () {
+    if (this.files && this.files.length > 0) {
+      fileName.textContent = `Selected: ${this.files[0].name}`;
+    } else {
+      fileName.textContent = 'No image selected yet';
+    }
+  });
+}
+</script>
+</body>
+</html>
