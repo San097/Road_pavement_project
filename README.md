@@ -245,3 +245,7 @@ Road-Pavement-Deterioration-Model/
 - Persistent history stored in a database instead of the session
 - Maintenance prioritisation and cost estimation
 - Map view of inspected road segments
+## 👤 Author
+
+**San097**
+GitHub: [@San097](https://github.com/San097)
